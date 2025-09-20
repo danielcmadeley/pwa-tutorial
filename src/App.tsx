@@ -9,6 +9,10 @@ import { TodoApp } from "./TodoApp";
 
 import "./App.css";
 
+interface CountResult {
+  count: number;
+}
+
 function App() {
   const [count, setCount] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,7 +58,7 @@ function App() {
         const existingTodos = await database.query(
           "SELECT COUNT(*) as count FROM todos",
         );
-        if ((existingTodos.rows[0] as any).count === 0) {
+        if ((existingTodos.rows[0] as CountResult).count === 0) {
           await database.query(`
             INSERT INTO todos (text, completed) VALUES
             ('Welcome! This todo demonstrates data persistence 🎉', false),

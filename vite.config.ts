@@ -1,37 +1,56 @@
-import { VitePWA } from 'vite-plugin-pwa';
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { VitePWA } from "vite-plugin-pwa";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), VitePWA({
-    strategies: 'injectManifest',
-    srcDir: 'src',
-    filename: 'sw.ts',
-    registerType: 'autoUpdate',
-    injectRegister: false,
+  optimizeDeps: {
+    exclude: ["@electric-sql/pglite"],
+  },
+  define: {
+    global: "globalThis",
+  },
+  plugins: [
+    react(),
+    VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
+      registerType: "autoUpdate",
+      injectRegister: false,
 
-    pwaAssets: {
-      disabled: false,
-      config: true,
-    },
+      pwaAssets: {
+        disabled: false,
+        config: true,
+      },
 
-    manifest: {
-      name: 'pwa-test-project',
-      short_name: 'ptp',
-      description: 'pwa-test-project',
-      theme_color: '#ffffff',
-    },
+      manifest: {
+        name: "pwa-test-project",
+        short_name: "ptp",
+        description: "pwa-test-project",
+        theme_color: "#ffffff",
+      },
 
-    injectManifest: {
-      globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
-    },
+      injectManifest: {
+        globPatterns: ["**/*.{js,css,html,svg,png,ico,wasm,data}"],
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB limit for PGlite WASM
+        dontCacheBustURLsMatching: /\.(?:js|css|wasm|data)$/,
+      },
 
-    devOptions: {
-      enabled: false,
-      navigateFallback: 'index.html',
-      suppressWarnings: true,
-      type: 'module',
+      devOptions: {
+        enabled: false,
+        navigateFallback: "index.html",
+        suppressWarnings: true,
+        type: "module",
+      },
+    }),
+  ],
+  server: {
+    fs: {
+      strict: false,
     },
-  })],
-})
+  },
+  worker: {
+    format: "es",
+  },
+});
